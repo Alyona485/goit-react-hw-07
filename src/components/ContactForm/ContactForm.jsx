@@ -5,7 +5,7 @@ import s from './ContactForm.module.css';
 // 1. Імпортуємо хук
 import { useDispatch } from 'react-redux';
 // 2. Імпортуємо фабрику екшену
-import { addContact } from '../../redux/contactsSlice';
+import { addContact } from '../../redux/contactsOps';
 
 const initialValues = {
   name: '',
@@ -32,18 +32,8 @@ const ContactForm = () => {
   // 3. Отримуємо посилання на функцію відправки екшенів
   const dispatch = useDispatch();
 
-  // const handleSubmit = (values, actions) => {
-  //   values.id = nanoid();
-  //   addContact(values);
-  //   actions.resetForm();
-  // };
-
   const handleSubmit = (values, actions) => {
-    values.id = nanoid();
-    //addContact(values);
-    //console.log('form values: ', values);
-
-    // id: "Skl1aZLW--pV2qxegs9VN"
+    // id: - це має встановлювати API
     // name: "zxczxc"
     // number: "222-22-22"
 
@@ -51,7 +41,6 @@ const ContactForm = () => {
     // 5. Відправляємо результат – екшен створення завдання
     dispatch(
       addContact({
-        id: values.id,
         name: values.name,
         number: values.number,
       })

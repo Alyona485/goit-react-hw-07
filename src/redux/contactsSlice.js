@@ -1,30 +1,49 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
+import { addContact, deleteContact, fetchContacts } from './contactsOps';
 
-const slice = createSlice({
-  // Ім'я слайсу
-  name: "contacts",
-  // Початковий стан редюсера слайсу
+const handlePending = state => {
+  state.isLoading = true;
+};
+
+const handleRejected = (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload;
+};
+
+const contactsSlice = createSlice({
+  name: 'tasks',
   initialState: {
-      items: [{ "id": "id-1", "name": "Rosie Simpson_", "number": "459-12-56" },
-          { "id": "id-2", "name": "Hermione Kline_", "number": "443-89-12" },
-          { "id": "id-3", "name": "Eden Clements_", "number": "645-17-79" },
-          { "id": "id-4", "name": "Annie Copeland_", "number": "227-91-26" }],
+    items: [],
+    isLoading: false,
+    error: null,
   },
-  // Об'єкт case-редюсерів
-  reducers: {
-    addContact(state, action) {
-      // ✅ Immer замінить це на операцію оновлення
-      state.items.push(action.payload);
-    },
-    deleteContact(state, action) {
-      // ✅ Immer замінить це на операцію оновлення
-      state.items = state.items.filter((item) => item.id !== action.payload);
-    },
+  // Додаємо обробку зовнішніх екшенів
+  extraReducers: builder => {
+    builder
+      .addCase(fetchContacts.pending, handlePending)
+      .addCase(fetchContacts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.items = action.payload;
+      })
+      .addCase(fetchContacts.rejected, handleRejected)
+      .addCase(deleteContact.pending, handlePending)
+      .addCase(deleteContact.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.items = state.items.filter(
+          contact => contact.id !== action.payload.id
+        );
+      })
+      .addCase(deleteContact.rejected, handleRejected)
+      .addCase(addContact.pending, handlePending)
+      .addCase(addContact.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.items.push(action.payload);
+      })
+      .addCase(addContact.rejected, handleRejected);
   },
 });
 
-// Експортуємо фабрики екшенів
-export const { addContact, deleteContact} = slice.actions;
-
-// Експортуємо редюсер слайсу
-export default slice.reducer;
+export default contactsSlice.reducer;
